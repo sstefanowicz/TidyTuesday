@@ -1,0 +1,58 @@
+---
+title: "TidyTuesday_1/28/25"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(tidytuesdayR)
+library(viridis)
+```
+
+```{r}
+water_insecurity_2022 <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-01-28/water_insecurity_2022.csv')
+water_insecurity_2023 <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-01-28/water_insecurity_2023.csv')
+```
+
+```{r}
+# Load packages -----
+library(tidycensus)
+library(sf) 
+library(janitor) 
+library(tidyverse)
+```
+
+
+```{r}
+# Data wrangling
+range(water_insecurity_2023$total_pop) #Check range of populations
+
+water_insecurity_2023_2 <- water_insecurity_2023 %>% mutate(total_pop_cat = cut(water_insecurity_2023$total_pop, breaks = c(-Inf, 200000, 500000, Inf), labels = c("Small", "Medium", "Large"), right = TRUE)) #Create a categorical variable for population size
+
+water_insecurity_2023_2 %>% count(total_pop_cat) #Check to see the distribution between categories
+
+summary_2023 <- water_insecurity_2023_2 %>% group_by(total_pop_cat) %>% summarize(total_pop_mean = mean(total_pop, na.rm = TRUE), plumbing_mean = mean(plumbing, na.rm = TRUE), percent_plumbing_by_cat = plumbing_mean / total_pop_mean * 100) %>% mutate(year = 2023)
+#Calculate the percentage lacking plumbing for each size category
+
+water_insecurity_2022_2 <- water_insecurity_2022 %>% mutate(total_pop_cat = cut(water_insecurity_2022$total_pop, breaks = c(-Inf, 200000, 500000, Inf), labels = c("Small", "Medium", "Large"), right = TRUE)) #Create a categorical variable for population size
+
+water_insecurity_2022_2 %>% count(total_pop_cat) #Check to see the distribution between categories
+
+summary_2022 <- water_insecurity_2022_2 %>% group_by(total_pop_cat) %>% summarize(total_pop_mean = mean(total_pop, na.rm = TRUE), plumbing_mean = mean(plumbing, na.rm = TRUE), percent_plumbing_by_cat = plumbing_mean / total_pop_mean * 100) %>% mutate(year = 2022)
+#Calculate the percentage lacking plumbing for each size category
+
+summary_combined <- bind_rows(summary_2022, summary_2023)
+#Combine the summary statistics for 2022 and 2023
+```
+
+```{r}
+#Data viz
+
+ggplot(summary_combined, aes(x = total_pop_cat, y = percent_plumbing_by_cat, fill = as.factor(year))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Percentage of Households Lacking Plumbing by County Size and Year", x = "County Total Population Size", y = "Percentage of Households Lacking Plumbing", fill = "Year", caption = "County Size Categories: Small: <200,000, Medium: 200,000–500,000, Large: >500,000") +
+  theme_classic() +
+  scale_fill_viridis_d(option = "cividis")
+```
