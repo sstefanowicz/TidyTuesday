@@ -24,7 +24,6 @@ library(janitor)
 library(tidyverse)
 ```
 
-
 ```{r}
 # Data wrangling
 range(water_insecurity_2023$total_pop) #Check range of populations
