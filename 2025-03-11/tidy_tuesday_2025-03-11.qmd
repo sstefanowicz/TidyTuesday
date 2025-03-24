@@ -1,0 +1,39 @@
+---
+title: "tidy_tuesday_2025-03-11"
+format: html
+editor: visual
+---
+
+```{r}
+# Load Packages
+library(tidyverse)
+library(tidytuesdayR)
+library(pixarfilms)
+```
+
+```{r}
+# Load Data
+pixar_films <- pixarfilms::pixar_films |>
+  dplyr::mutate(
+    dplyr::across(
+      c("number", "run_time"),
+      as.integer
+    )
+  )
+public_response <- pixarfilms::public_response |>
+  dplyr::mutate(
+    dplyr::across(
+      c("rotten_tomatoes", "metacritic", "critics_choice"),
+      as.integer
+    )
+  )
+```
+
+```{r}
+# Data Wrangling
+pixar_films_working <- pixar_films %>% select(-number)
+
+pixar_films_combined <- left_join(pixar_films_working, public_response, by = "film")
+
+# Explore relationship between runtime and G vs PG and public reception scores
+```
