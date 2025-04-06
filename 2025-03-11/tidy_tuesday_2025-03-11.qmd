@@ -51,7 +51,7 @@ pixar_films_combined <- pixar_films_combined %>% mutate(cinema_score_numeric = c
 score_plot <- ggplot(pixar_films_combined, aes(x = release_date, y = ave_score)) +
   geom_point(color = "gray25") +
   geom_text(aes(label = film), size = 2.8, vjust = .5, hjust = -.15, color = "gray25") +
-  labs(title = "Public Reception of Pixar Films over Time", x = "Release Date", y = "Audience and Critic Reception") +
+  labs(title = "Public Reception of Pixar Films over Time", x = "Release Date", y = "Public Reception Score") +
   theme_minimal() +
   theme(axis.text.x = element_blank())
 
@@ -67,4 +67,6 @@ release_plot <- ggplot(pixar_films_combined, aes(x = release_date)) +
 combined_plot <- score_plot / release_plot + plot_layout(heights = c(1, 0.07), guides = "collect")
 
 combined_plot
+
+ggsave("tidy_tuesday_2025-03-11_viz.png", plot = combined_plot, width = 8, height = 5.5)
 ```

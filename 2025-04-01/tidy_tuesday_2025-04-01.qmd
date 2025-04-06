@@ -1,0 +1,18 @@
+---
+title: "Tidy Tuesday 2025-04-01"
+author: "Sebastian Stefanowicz"
+format: html
+editor: visual
+---
+
+```{r load data, message = FALSE}
+pokemon <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-04-01/pokemon_df.csv')
+```
+
+```{r data wrangling}
+
+```
+
+```{r viz}
+# total points vs generation, total points vs size (can do stacked bar plot with breakdown of types of points (special, attack, hp, etc))
+```
