@@ -46,7 +46,7 @@ pixar_films_combined <- pixar_films_combined %>% mutate(cinema_score_numeric = c
 )
 ```
 
-```{r viz, fig.width = 8, fig.height = 5}
+```{r viz, fig.width = 8, fig.height = 5.5}
 # Scatterplot of public reception over time combined with a small geom_segment to help visualize the frequency of releases
 score_plot <- ggplot(pixar_films_combined, aes(x = release_date, y = ave_score)) +
   geom_point(color = "gray25") +
@@ -57,7 +57,7 @@ score_plot <- ggplot(pixar_films_combined, aes(x = release_date, y = ave_score))
 
 release_plot <- ggplot(pixar_films_combined, aes(x = release_date)) +
   geom_segment(aes(xend = release_date, y = 0, yend = 1), linewidth = 0.8, color = "gray25") +
-  labs(x = "Frequency of Releases", y = NULL) +
+  labs(x = "Frequency of Releases", y = NULL, caption = "Note: Public Reception Score is a simple average of Metacritic, Cinema Score, Rotten Tomatoes, and Critics Choice scores") +
   theme_minimal() +
   theme(axis.text.y = element_blank(), 
         axis.ticks.y = element_blank(), 
