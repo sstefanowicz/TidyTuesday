@@ -67,6 +67,4 @@ release_plot <- ggplot(pixar_films_combined, aes(x = release_date)) +
 combined_plot <- score_plot / release_plot + plot_layout(heights = c(1, 0.07), guides = "collect")
 
 combined_plot
-
-ggsave("tidy_tuesday_2025-03-11_viz.png", plot = combined_plot, width = 8, height = 5.5)
 ```

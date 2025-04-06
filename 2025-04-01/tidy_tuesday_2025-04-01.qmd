@@ -5,14 +5,96 @@ format: html
 editor: visual
 ---
 
+```{r load packages, message=FALSE}
+library(tidyverse)
+```
+
 ```{r load data, message = FALSE}
 pokemon <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-04-01/pokemon_df.csv')
 ```
 
 ```{r data wrangling}
+# Set up weight factor variable and group_by+summarize each stat for each weight category
+pokemon_by_weight <- pokemon %>% mutate(weight_cat = case_when(
+  weight > 500 ~ ">500",
+  weight > 300 & weight <= 500 ~ "300-500",
+  weight > 200 & weight <= 300 ~ "200-300",
+  weight > 100 & weight <= 200 ~ "100-200",
+  weight > 50 & weight <= 100 ~ "50-100",
+  weight > 25 & weight <= 50 ~ "25-50",
+  weight > 0 & weight <= 25 ~ "0-25"
+  )) %>%
+  mutate(weight_cat = factor(weight_cat, levels = c("0-25", "25-50", "50-100", "100-200", "200-300", "300-500", ">500"))) %>%
+  group_by(weight_cat) %>%
+  summarize(
+    hp_ave = mean(hp),
+    attack_ave = mean(attack),
+    defense_ave = mean(defense),
+    special_attack_ave = mean(special_attack),
+    special_defense_ave = mean(special_defense),
+    speed_ave = mean(speed),
+  )
 
+# Pivot to set up for plot
+pokemon_by_weight_long <- pokemon_by_weight %>%
+  pivot_longer(
+    cols = c(hp_ave, attack_ave, defense_ave, special_attack_ave, special_defense_ave, speed_ave),
+    names_to = "stat",
+    values_to = "average"
+  ) %>% mutate(stat = factor(stat, levels = c(
+    "hp_ave",
+    "attack_ave",
+    "defense_ave",
+    "special_attack_ave",
+    "special_defense_ave",
+    "speed_ave"
+  )))
 ```
 
 ```{r viz}
-# total points vs generation, total points vs size (can do stacked bar plot with breakdown of types of points (special, attack, hp, etc))
+# Set up legend names
+stat_labels <- c(
+  hp_ave = "HP",
+  attack_ave = "Attack",
+  defense_ave = "Defense",
+  special_attack_ave = "Sp. Attack",
+  special_defense_ave = "Sp. Defense",
+  speed_ave = "Speed"
+)
+
+# Set up custom colors
+stat_colors <- c(
+  hp_ave = "#E42217",
+  attack_ave = "#FF8040",
+  defense_ave = "#FDD017",
+  special_attack_ave = "#157DEC",
+  special_defense_ave = "#4CC552",
+  speed_ave = "#F778A1"
+)
+
+# Plots
+plot1 <- ggplot(pokemon_by_weight_long, aes(x = weight_cat, y = average, fill = stat)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = stat_colors, labels = stat_labels) +
+  labs(
+    title = "Average Pokémon Stats by Weight Category",
+    x = "Weight Category (lbs)",
+    y = "Average Stat Value",
+    fill = "Stat"
+  ) +
+  theme_classic()
+
+plot2 <- ggplot(pokemon_by_weight_long, aes(x = weight_cat, y = average, fill = stat)) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_fill_manual(values = stat_colors, labels = stat_labels) +
+  labs(
+    title = "Proportion of Pokémon Stat Total by Weight Category",
+    x = "Weight Category (lbs)",
+    y = "Proportion of Stat Total",
+    fill = "Stat"
+  ) +
+  theme_classic()
+
+plot1
+plot2
 ```
